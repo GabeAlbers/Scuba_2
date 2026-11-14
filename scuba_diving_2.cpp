@@ -340,6 +340,52 @@ class game_map
 
         }
 
+        //this is the starting point of adding a new map that connects at the bottom
+        //i want to make a search starting at the end of the game not toutching the last tile
+        void add_bottom_hole()
+        {
+            int hole_width = 3;
+            int hole_x_start = -1;
+
+            //now i need a valid place with y random map generation
+            for (int x = width - hole_width - 1; x >= 0; x--)
+            {
+                bool valid true;
+
+                //cheking the three tiles at the bottom ocean floor above the hole is air
+                for (int i = 0; i < hole_width: i++)
+                {
+
+                    bool valid = true;
+
+                    if (grid[height - 2][x + i] != ' ')
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                //i need this to only make 1 hole
+                if (valid)
+                {
+
+                    hole_x = x;
+                    break;
+                }
+            }
+
+            //now we make an entrance
+            if (hole_x != -1)
+            {
+                for (int x = hole_x_start; x < hole_x_start + hole_width; x++)
+                {
+                    grid[height - 1][x] = ' ';
+                }
+            }
+
+
+        }
+
         void setup_level()
         {
             //(for this to be more readble things that are being put in 
@@ -364,6 +410,9 @@ class game_map
             add_random_pillar();
             //adds a cliff at he start
             add_beginning_cliff();
+
+            //now add hole
+            add_bottom_hole();
 
             //add 10 treasure '?' places
             add_treasures(10);
@@ -451,14 +500,37 @@ class game_map
         void inspect_menu(submarine& sub)
         {
 
-            //just using a random alue to fill
-            char choice = 'm'; 
-            bool inpscting_around = true;
+            //check all directuons if treasure is nearby
+            bool has_up = (sub.y > 0 && (grid[sub.y - 1][sub.x] == '?' || grid[sub.y - 1][sub.x] == '2'));
+            bool has_down = (sub.y < height - 1 && (grid[sub.y + 1][sub.x] == '?' || grid[sub.y + 1][sub.x] == '2'));
+            bool has_left = (sub.x > 0 && (grid[sub.y][sub.x - 1] == '?' || grid[sub.y][sub.x - 1] == '2'));
+            bool has_right = (sub.x < width - 1 && (grid[sub.y][sub.x + 1] == '?' || grid[sub.y][sub.x + 1] == '2'));
+            int count = 0;
 
-            while (inpscting_around)
+            //count how many there are
+            if (has_up) count++;
+            if (has_down) count++;
+            if (has_left) count++;
+            if (has_right) count++;
+
+            if (count == 0)
+            {
+                cout << "\nNo treasure close enough to inspect." << endl;
+                return;
+            }
+
+            char choice = ' ';
+            bool valid_choice = false;
+
+            while (!valid_choice)
             {
                 cout << "\n===Inspection Menu==" << endl
-                     << "Choose a direction (W/A/S/D) to inspect or enter 'C' to cancel: ";
+                     << "Avalable Options: ";
+                    if (has_up) cout << "[W: up] ";
+                    if (has_down) cout << "[S: down] ";
+                    if (has_left) cout << "[A: left] ";
+                    if (has_right) cout << "[D: Right] ";
+                    cout << "\nChoose a direction (W/A/S/D) to inspect or enter 'C' to cancel: ";
 
                 //input time
                 cin >> choice;
@@ -489,13 +561,7 @@ class game_map
                 int target_x = sub.x;
                 int target_y = sub.y;
 
-                if (choice == 'w') //start here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                {
-                    if (sub.y > 0 && (grid[sub.y - 1][sub.x] == '?')
-                    {
-
-                    }
-                }
+                if (choice == 'w' && has_up) {target_y--; valid_choice = true;}
                 else if (choice == 's' && has_down) {target_y++; valid_choice = true;}
                 else if (choice == 'a' && has_left) {target_x--; valid_choice = true;}
                 else if (choice == 'd' && has_right) {target_x++; valid_choice = true;}
