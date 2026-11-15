@@ -60,9 +60,14 @@ class submarine
 class game_map
 {
     private:
+
         int width; 
         int height;
+
         vector<string> grid;
+
+        int bottom_hole_x = -1;
+        int bottom_hole_y = -1;
 
 
     public:
@@ -169,6 +174,17 @@ class game_map
         char get_tile(int x, int y)
         {
             return grid[y][x];
+        }
+
+        //new functions to gt the hole hights and leignth
+        int get_hole_x() const
+        {
+            return bottom_hole_x;
+        }
+
+        int get_hole_y() const
+        {
+            return bottom_hole_y;
         }
 
 
@@ -350,13 +366,11 @@ class game_map
             //now i need a valid place with y random map generation
             for (int x = width - hole_width - 1; x >= 0; x--)
             {
-                bool valid true;
+                bool valid = true;
 
                 //cheking the three tiles at the bottom ocean floor above the hole is air
-                for (int i = 0; i < hole_width: i++)
+                for (int i = 0; i < hole_width; i++)
                 {
-
-                    bool valid = true;
 
                     if (grid[height - 2][x + i] != ' ')
                     {
@@ -369,13 +383,17 @@ class game_map
                 if (valid)
                 {
 
-                    hole_x = x;
+                    hole_x_start = x;
+
+                    bottom_hole_x = x + 1;
+
+                    bottom_hole_y = height - 1;
                     break;
                 }
             }
 
             //now we make an entrance
-            if (hole_x != -1)
+            if (hole_x_start != -1)
             {
                 for (int x = hole_x_start; x < hole_x_start + hole_width; x++)
                 {
@@ -582,6 +600,52 @@ class game_map
         }
 
 
+
+
+};
+
+
+class cave_map
+{
+    private:
+
+        int width;
+        int height;
+
+        vector<string> grid;
+
+
+
+    public:
+
+        cave_map()
+        {
+
+            width = 32;
+
+            height = 16;
+
+            grid = 
+            {
+
+            "###   #########################",
+            "##    #########################",
+            "##    #########     0    | /  ##",
+            "##    #########     0    | #  ##",
+            "##    #########   ##############",
+            "##    #########   ##############",
+            "##                   0   |  ####",
+            "##                   0   | $ ####",
+            "###                  0   | # ####",
+            "##############   ###############",
+            "##############   ###############",
+            "##############    0     ########",
+            "##############    0  /  ########",
+            "##############    0  #  ########",
+            "################################",
+            "################################"
+            };
+        }
 
 
 };
