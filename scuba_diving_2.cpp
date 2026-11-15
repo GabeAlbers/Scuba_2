@@ -610,7 +610,7 @@ class cave_map
     private:
 
         //the map is always he sme size gr ow so im initalizing the values
-        int width = 36;
+        int width = 32;
         int height = 16;
 
         vector<string> grid;
@@ -629,13 +629,13 @@ class cave_map
         int door_1_x = 25;
         int door_1_y = 2;
 
-        int door_2_x = 23;
+        int door_2_x = 25;
         int door_2_y = 6;
 
-        int lever_1_x = 29;
+        int lever_1_x = 27;
         int lever_1_y = 2;
 
-        int lever_2_x = 26;
+        int lever_2_x = 20;
         int lever_2_y = 12;
 
         int door_1_id = 1;
@@ -713,6 +713,61 @@ class cave_map
             }
         }
 
+        //now camera version
+        void print_camera(const submarine& sub)
+        {
+            int view_size = 5;
+            int half_size = view_size / 2;
+
+            int start_x = sub.x - half_size;
+            int end_x = sub.x + half_size;
+
+            int start_y = sub.y - half_size;
+            int end_y = sub.y + half_size;
+
+            //camera orizontal
+            if (start_x < 0)
+            {
+                end_x += -start_x;
+                start_x = 0;
+            } if (end_x >= width)
+            {
+                int difference = end_x - (width - 1);
+                start_x -= difference;
+                end_x = width - 1;
+            }
+
+            //camera vertical
+            if (start_y < 0)
+            {
+                end_y += -start_y;
+                start_y = 0;
+            } if (end_y >= height)
+            {
+                int difference = end_y - (height - 1);
+                start_y -= difference;
+                end_y = height - 1;
+            }
+
+            //now print
+            for (int y = start_y; y <= end_y; y++)
+            {
+                for (int x = start_x; x <= end_x; x++)
+                {
+                    if (x == sub.x && y == sub.y)
+                    {
+                        cout << '@';
+                    }
+                    else
+                    {
+                        cout << grid[y][x];
+                    }
+                }
+
+                cout << endl;
+            }
+        }
+
         //my last checker was kind of invasive lets do this instaed for now
 
         bool is_valid_move(int target_x, int target_y) const
@@ -778,7 +833,6 @@ class cave_map
             if (sub.current_oxygen > 0)
             {
                 sub.current_oxygen--;
-                sub.current_oxygen--;
             }
 
             //first i have to check if they got to an air bubble before killing them off
@@ -801,7 +855,57 @@ class cave_map
 
         void activate_lever(int lever_id, submarine& sub)
         {
-            //function goe here
+            if (lever_id == 1)
+            {
+                //Switch the door state
+                door_1_open = !door_1_open;
+
+                if (door_1_open == true)
+                {
+                    grid[2][door_1_x] = ' '; //takes out the door
+                    grid[3][door_1_x] = ' ';
+
+                    grid[lever_1_y][lever_1_x] = '\\'; //apperently you need 2 to just print 1 
+
+                    sub.last_message = "Lever activated! You heard a strange noise?";
+                }
+                else 
+                {
+                    grid[2][door_1_x] = '|'; //puts door back
+                    grid[3][door_1_x] = '|';
+
+                    grid[lever_1_y][lever_1_x] = '/';
+
+                    sub.last_message = "Lever deactivated! A strange noise follows?";
+                }
+            }
+
+            else if (lever_id == 2) //same thing
+            {
+                door_2_open = !door_2_open;
+
+                if (door_2_open == true)
+                {
+                    grid[6][door_2_x] = ' ';
+                    grid[7][door_2_x] = ' ';
+                    grid[8][door_2_x] = ' ';
+
+                    grid[lever_2_y][lever_2_x] = '\\';
+
+                    sub.last_message = "Lever activated! Somthing sounds like it moved?";
+                }
+                else
+                {
+                    grid[6][door_2_x] = '|';
+                    grid[7][door_2_x] = '|';
+                    grid[8][door_2_x] = '|';
+
+                    grid[lever_2_y][lever_2_x] = '/';
+
+                    sub.last_message = "Lever deactivated! A loud thud rings in the cave!";
+        
+                }
+            }
         }
 
         //this is going to be hard :/
@@ -975,7 +1079,6 @@ void submarine::player_input(char input, const game_map& map)
         if (current_oxygen > 0)
         {
             current_oxygen--;
-            current_oxygen--;
         }
     }
 }
@@ -983,8 +1086,17 @@ void submarine::player_input(char input, const game_map& map)
 
 void run_game(bool use_camera)
 {
+    //make both maps!!!
     game_map ocean_map(50,12);
+    cave_map underground;
+
     submarine my_sub(5, 1, 100); //collumn 5 row 2 with 100 oxygen
+
+    bool inside_cave = false;
+
+    //use these to return later
+    int ocean_return_x = 0;
+    int ocean_return_y = 0;
 
     char input = ' ';
 
@@ -998,15 +1110,29 @@ void run_game(bool use_camera)
              << "==================================================" 
              << endl;
 
-             if (use_camera)//this take the input and either shows the player the cam version or the full map version
+             //adding cave camera
+             if (inside_cave)
              {
-                ocean_map.print_camera(my_sub);
+                if (use_camera)
+                {
+                    underground.print_camera(my_sub);
+                }
+                else 
+                {
+                    underground.print_map_with_sub(my_sub);
+                }
              }
-             else 
+             else
              {
-                ocean_map.print_map_with_sub(my_sub);
-             }
-  
+                if (use_camera)//this take the input and either shows the player the cam version or the full map version
+                {
+                    ocean_map.print_camera(my_sub);
+                }
+                else 
+                {
+                    ocean_map.print_map_with_sub(my_sub);
+                }
+            }
         cout << "controls: movment (w/a/s/d) up, left, down, and right | i (inspect) | q = quit" << endl;
         cout << "enter move: "; 
 
@@ -1025,38 +1151,86 @@ void run_game(bool use_camera)
 
         }
 
-        if (input == 'i')
+        //cave map
+        if (inside_cave)
         {
-            ocean_map.inspect_menu(my_sub);
-        }
-        else if (input != 'q')
-        {
-
-            my_sub.player_input(input, ocean_map);
-
-            //if the su is at the surface then this happens
-            if (my_sub.y == 0  || ocean_map.get_tile(my_sub.x, my_sub.y) == '~')
+            //surface
+            if (input == 'w' && my_sub.y == 0)
             {
-                int gold_total = my_sub.gold_coins_found * 150;
-                int relic_total = my_sub.relics_found * 300;
+                inside_cave = false;
 
-                cout << "\n==================================================" << endl
-                     << "            Succsessfull Surface!                " << endl
-                     << "Surface air has been reached and your oxygen has been refilled!" << endl
-                     << "----------------------------------------------------" << endl
-                     << "                   Rewards                          " << endl
-                     << "Gold Coins Found     :" << my_sub.gold_coins_found << " x 150 = $" << gold_total << endl
-                     << "Relics found         :" << my_sub.relics_found << " x 300 = $" << relic_total << endl
-                     << "Air pockets decovered:" << my_sub.oxygen_pockets_found << endl
-                     << "Fish seen            :" << my_sub.fish_descovered_count << endl
-                     << "==================================================" << endl
-                     << "Total Earnings : $" << my_sub.total_earnings << endl
-                     << "==================================================" << endl;
+                my_sub.x = ocean_return_x;
+                my_sub.y = ocean_return_y;
 
-                    break;
+                my_sub.last_message = "Ocean map loaded...";
+
+                continue;
+            }
+
+            //inspect underground 
+
+            if (input == 'i')
+            {
+                underground.inspect_menu(my_sub);
+            }
+            else
+            {
+                underground.player_move(input, my_sub);
             }
         }
 
+        //ocean map stuff
+        else 
+        {
+            if (input == 'i')
+            {
+                ocean_map.inspect_menu(my_sub);
+            }
+            else 
+            {
+
+                my_sub.player_input(input, ocean_map);
+
+                //checking for bottom hole
+                if (my_sub.x == ocean_map.get_hole_x() && my_sub.y == ocean_map.get_hole_y())
+                {
+                    ocean_return_x = my_sub.x;
+                    ocean_return_y = my_sub.y - 1;
+
+                    // Switch to cave
+                    inside_cave = true;
+
+                    // Place submarine inside cave
+                    my_sub.x = 4;
+                    my_sub.y = 1;
+
+                    my_sub.last_message =
+                        "You entered an underground cave!";
+                }
+
+                //if the sub is at the surface then this happens
+                if (my_sub.y == 0  || ocean_map.get_tile(my_sub.x, my_sub.y) == '~')
+                {
+                    int gold_total = my_sub.gold_coins_found * 150;
+                    int relic_total = my_sub.relics_found * 300;
+
+                    cout << "\n==================================================" << endl
+                        << "            Succsessfull Surface!                " << endl
+                        << "Surface air has been reached and your oxygen has been refilled!" << endl
+                        << "----------------------------------------------------" << endl
+                        << "                   Rewards                          " << endl
+                        << "Gold Coins Found     :" << my_sub.gold_coins_found << " x 150 = $" << gold_total << endl
+                        << "Relics found         :" << my_sub.relics_found << " x 300 = $" << relic_total << endl
+                        << "Air pockets decovered:" << my_sub.oxygen_pockets_found << endl
+                        << "Fish seen            :" << my_sub.fish_descovered_count << endl
+                        << "==================================================" << endl
+                        << "Total Earnings : $" << my_sub.total_earnings << endl
+                        << "==================================================" << endl;
+
+                        break;
+                }
+            }
+        }
     }
 }
 
