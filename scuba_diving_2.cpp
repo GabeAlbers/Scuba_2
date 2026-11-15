@@ -638,6 +638,12 @@ class cave_map
         int lever_2_x = 26;
         int lever_2_y = 12;
 
+        int door_1_id = 1;
+        int door_2_id = 2;
+
+        int lever_1_id = 1;
+        int lever_2_id = 2;
+
     public:
 
         //make the map!
@@ -793,6 +799,11 @@ class cave_map
             
         }
 
+        void activate_lever(int lever_id, submarine& sub)
+        {
+            //function goe here
+        }
+
         //this is going to be hard :/
         void inspect_menu(submarine& sub)
         {
@@ -869,17 +880,67 @@ class cave_map
                          sub.last_message = "Rare Gemstone collected! +$1000!";
                 }
 
+                else if (tile == '0')
+                {
+                    sub.last_message = "You see what looks like air bubbles?";
+                }
+
                 //levers menu
                 else if (tile == '/')
                 {
                     int lever_id = 0;
 
+                    if (target_x == lever_1_x && target_y == lever_1_y)
+                    {
+                        lever_id = 1;
+                    } 
+                    
+                    else if (target_x == lever_2_x && target_y == lever_2_y)
+                    {
+                        lever_id = 2;
+                    }
+
+                    cout << "\nYou descovered a mechanical lever." << endl 
+                         << "This lever looks like it has a symbol,its hard to read but it looks like the number " << lever_id << endl
+                         << "Activate this lever? enter [Y]: yes [N]: no" << endl
+                         << "Input: ";
+
+                    char confirm;
+                    cin >> confirm;
+
+                    confirm = tolower(confirm);
+
+                    if (confirm == 'y')
+                    {
+                        //I will make a function for this later
+                        activate_lever(lever_id, sub);
+                    }
                 }
 
-                
-            }
+                //doors interaction almost same as lever kinda
+                else if (tile == '|')
+                {
+                    int door_id = 0;
+        
+                    if (target_x == door_1_x && target_y >= 2 && target_y <= 3)
+                    {
+                        door_id = 1;
+                    }
+                    else if (target_x == door_2_x && target_y >= 6 && target_y <= 8)
+                    {
+                        door_id = 2;
+                    }
 
+                    cout << "You discovered a mechanical door!" << endl
+                         << "the number" << door_id << "is stamped all over the door" << endl;
+
+                }
+
+            }
+                
         }
+
+    
 
 
 
