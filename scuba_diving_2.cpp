@@ -1047,8 +1047,8 @@ class cave_map
                         lever_id = 2;
                     }
 
-                    cout << "\nYou descovered a mechanical lever." << endl 
-                         << "This lever looks like it has a symbol, its hard to read but it looks like the number " << lever_id << endl;
+                    sub.last_message = "You descovered a mechanical lever.\nThis lever looks like it has a symbol, its hard to read but it looks like the number " + to_string(lever_id);
+                         return;
 
 
                     char confirm = ' ';
@@ -1110,8 +1110,8 @@ class cave_map
                         door_id = 2;
                     }
 
-                    cout << "You discovered a mechanical door!" << endl
-                         << "the number " << door_id << " is stamped all over the door" << endl;
+                    sub.last_message = "You discovered a mechanical door!\nthe number " + to_string(door_id) + " is stamped all over the door";
+                    return;
 
                 }
 
@@ -1238,20 +1238,25 @@ void run_game(bool use_camera)
 
         }
 
+        input = tolower(input);
+
         //cave map
         if (inside_cave)
         {
             //surface
-            if (input == 'w' && my_sub.y == 0)
+            if (input == 'w' && 
+                my_sub.y == 0 && 
+                my_sub.x >= 3 && 
+                my_sub.x <= 5)
             {
                 inside_cave = false;
 
-                my_sub.x = ocean_return_x;
-                my_sub.y = ocean_return_y;
+                my_sub.x = ocean_map.get_hole_x() - 1 + (my_sub.x - 3);
+
+                my_sub.y = ocean_map.get_hole_y();
 
                 my_sub.last_message = "Ocean map loaded...";
 
-                continue;
             }
 
             //inspect underground 
@@ -1273,30 +1278,29 @@ void run_game(bool use_camera)
             {
                 ocean_map.inspect_menu(my_sub);
             }
-            else 
+            else if (input == 's' && 
+                    my_sub.y == ocean_map.get_hole_y() &&
+                    my_sub.x >= ocean_map.get_hole_x() - 1 &&
+                    my_sub.x <= ocean_map.get_hole_x() + 1)
             {
 
+                my_sub.x = 3 + (my_sub.x - (ocean_map.get_hole_x() - 1));
+
+                my_sub.y = 0;
+
+                inside_cave = true;
+
+
+                my_sub.last_message = "Underground cave loaded...";
+
+            }
+            else
+            {
                 my_sub.player_input(input, ocean_map);
-
-                //checking for bottom hole
-                if (my_sub.x == ocean_map.get_hole_x() && my_sub.y == ocean_map.get_hole_y())
-                {
-                    ocean_return_x = my_sub.x;
-                    ocean_return_y = my_sub.y - 1;
-
-                    // Switch to cave
-                    inside_cave = true;
-
-                    // Place submarine inside cave
-                    my_sub.x = 4;
-                    my_sub.y = 1;
-
-                    my_sub.last_message =
-                        "You entered an underground cave!";
-                }
+            }
 
                 //if the sub is at the surface then this happens
-                if (my_sub.y == 0  || ocean_map.get_tile(my_sub.x, my_sub.y) == '~')
+                if (!inside_cave && input == 'w' && my_sub.y == 0)
                 {
                     int gold_total = my_sub.gold_coins_found * 150;
                     int relic_total = my_sub.relics_found * 300;
@@ -1316,7 +1320,7 @@ void run_game(bool use_camera)
 
                         break;
                 }
-            }
+            
         }
     }
 }
