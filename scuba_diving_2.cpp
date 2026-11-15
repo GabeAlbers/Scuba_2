@@ -632,11 +632,11 @@ class cave_map
         int door_2_x = 25;
         int door_2_y = 6;
 
-        int lever_1_x = 27;
-        int lever_1_y = 2;
+        int lever_1_x = 21;
+        int lever_1_y = 12;
 
-        int lever_2_x = 20;
-        int lever_2_y = 12;
+        int lever_2_x = 27;
+        int lever_2_y = 2;
 
         int door_1_id = 1;
         int door_2_id = 2;
@@ -832,8 +832,11 @@ class cave_map
             //remove oxygen
             if (sub.current_oxygen > 0)
             {
-                sub.current_oxygen--;
+                //sub.current_oxygen--;
             }
+
+            //successfull movment message so you dont keep errors and such
+            sub.last_message = "A valid input was made!";
 
             //first i have to check if they got to an air bubble before killing them off
             char& tile = grid[sub.y][sub.x];
@@ -990,7 +993,7 @@ class cave_map
                 }
 
                 //levers menu
-                else if (tile == '/')
+                else if (tile == '/' || tile == '\\')
                 {
                     int lever_id = 0;
 
@@ -1005,19 +1008,52 @@ class cave_map
                     }
 
                     cout << "\nYou descovered a mechanical lever." << endl 
-                         << "This lever looks like it has a symbol,its hard to read but it looks like the number " << lever_id << endl
-                         << "Activate this lever? enter [Y]: yes [N]: no" << endl
-                         << "Input: ";
+                         << "This lever looks like it has a symbol, its hard to read but it looks like the number " << lever_id << endl;
 
-                    char confirm;
-                    cin >> confirm;
 
-                    confirm = tolower(confirm);
+                    char confirm = ' ';
 
-                    if (confirm == 'y')
+                    bool valid_input = false;
+
+                    while (!valid_input)
                     {
-                        //I will make a function for this later
-                        activate_lever(lever_id, sub);
+                        cout << "Activate this lever? enter [Y]: yes [N]: no" << endl
+                             << "Input: ";
+
+                        cin >> confirm;
+
+                        //actually check for errors
+                        if (cin.fail())
+                        {
+                            cin.clear();
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                            cout << "\nError! please input Y or N." << endl;
+                            continue;
+                        }
+
+                        confirm = tolower(confirm);
+
+                        //valid input?
+                        if (confirm == 'y')
+                        {
+                            //I will make a function for this later
+                            cout << "test that this runs";
+
+                            activate_lever(lever_id, sub);
+                            valid_input = true;
+                        } 
+                        else if (confirm == 'n')
+                        {
+                            sub.last_message = "You didn't toutch the lever.";
+                            valid_input = true;
+                        }
+                        else 
+                        {
+                            cout << "\nInvalid option please eneter Y or N." << endl;
+
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        }
                     }
                 }
 
@@ -1078,8 +1114,11 @@ void submarine::player_input(char input, const game_map& map)
 
         if (current_oxygen > 0)
         {
-            current_oxygen--;
+            //current_oxygen--;
         }
+
+        //successfull movment message so you dont keep errors and such again...
+        last_message = "A valid input was made!";
     }
 }
 
@@ -1137,6 +1176,15 @@ void run_game(bool use_camera)
         cout << "enter move: "; 
 
         cin >> input;
+
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            my_sub.last_message = "Invalid input!";
+            continue;
+        }
 
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
