@@ -609,22 +609,45 @@ class cave_map
 {
     private:
 
-        int width;
-        int height;
+        //the map is always he sme size gr ow so im initalizing the values
+        int width = 36;
+        int height = 16;
 
         vector<string> grid;
 
+        //i need these to keep track of whats open and closed
+        bool door_1_open = false;
 
+        bool door_2_open = false;
+
+        //door and lever chors need to be sored and its not random so Im jus going to do this manually kina...
+        //I wish I could have made functions and i might later bt this will have to do for my first ideration
+
+        //this also may be confusing but i have been doing it like this whe whole time y is going up to down and it somehow just make sence to me now and its too late to change i into a normal grid system
+      
+        //building onto that tis is just the start of the door and such not all the things
+        int door_1_x = 25;
+        int door_1_y = 2;
+
+        int door_2_x = 23;
+        int door_2_y = 6;
+
+        int lever_1_x = 29;
+        int lever_1_y = 2;
+
+        int lever_2_x = 26;
+        int lever_2_y = 12;
 
     public:
 
+        //make the map!
         cave_map()
         {
-
             width = 32;
 
             height = 16;
 
+            //visually this is how the map will always look
             grid = 
             {
 
@@ -645,6 +668,20 @@ class cave_map
             "################################",
             "################################"
             };
+
+            //freind said i shoule make sure all the lines are the same width so im going to do that
+            for (string& row : grid)
+            {
+                row.resize(width, '#');
+            }
+
+            //the cave entrance needs chords I think so its going to me saves here as well as making sure that its open there
+            for (int x = 3; x <= 5; x++)
+            {
+                //again idk why but i got used to the y, x format building up to down for y and left to right for x. I think of it as reading a book
+                grid[0][x] = ' ';
+            }
+
         }
 
 
