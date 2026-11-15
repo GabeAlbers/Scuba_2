@@ -684,6 +684,56 @@ class cave_map
 
         }
 
+        //currently as I make this developer mode is in mind and I will have to make/change for a camera later
+        void print_map_with_sub(const submarine& sub)
+        {
+            //actually I can make this kinda easy to copy + paste later and add camera values
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (x == sub.x && y == sub.y)
+                    {
+                        cout << '@';
+                    }
+                    else
+                    {
+                        cout << grid[y][x];
+                    }
+                }
+
+                //every y needs an endl
+                cout << endl;
+            }
+        }
+
+        //my last checker was kind of invasive lets do this instaed for now
+
+        bool is_valid_move(int target_x, int target_y) const
+        {
+            if (target_x < 0 || target_x >= width || target_y < 0 || target_y >= height)
+            {
+                return false;
+            }
+
+            char tile = grid[target_y][target_x]
+
+            if (tile == '#')
+            {
+                return false;
+            }else
+            if (tile == '|')
+            {
+                return false;
+            } else 
+            {
+                return true;
+            }
+        } 
+
+        //moving sub time i guess im kinda in that flow
+
+        void player_move(char input, subarine& sub)
 
 };
 
