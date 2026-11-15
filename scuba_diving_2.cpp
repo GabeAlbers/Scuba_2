@@ -716,12 +716,12 @@ class cave_map
                 return false;
             }
 
-            char tile = grid[target_y][target_x]
+            char tile = grid[target_y][target_x];
 
             if (tile == '#')
             {
                 return false;
-            }else
+            } else
             if (tile == '|')
             {
                 return false;
@@ -733,7 +733,155 @@ class cave_map
 
         //moving sub time i guess im kinda in that flow
 
-        void player_move(char input, subarine& sub)
+        void player_move(char input, submarine& sub)
+        {
+            int target_x = sub.x;
+            int target_y = sub.y;
+
+            input = tolower(input);
+
+            //check if they got was or d
+            if (input == 'w') 
+            {
+                target_y--;
+            }else if (input == 's')
+            {
+                target_y++;
+            }else if (input == 'a')
+            {
+                target_x--;
+            }else if (input == 'd')
+            {
+                target_x++;
+            } else
+            {
+                sub.last_message = "Invalid move!";
+                return;
+            }
+
+            if (!is_valid_move(target_x, target_y))
+            {
+                sub.last_message = "A cave wall or closed door blocks that way!";
+                return;
+            }
+
+            sub.x = target_x;
+            sub.y = target_y;
+
+            //remove oxygen
+            if (sub.current_oxygen > 0)
+            {
+                sub.current_oxygen--;
+                sub.current_oxygen--;
+            }
+
+            //first i have to check if they got to an air bubble before killing them off
+            char& tile = grid[sub.y][sub.x];
+
+            if (tile == '0')
+            {
+                sub.current_oxygen = sub.max_oxygen;
+
+                sub.last_message = "Oxygen bubbles filled your air supply!";
+
+                //i want the bubbles to stay there
+
+            }else
+            {
+                //i need to add a end run thing here leaving blank for now
+            }
+            
+        }
+
+        //this is going to be hard :/
+        void inspect_menu(submarine& sub)
+        {
+
+            //similar to before
+            bool has_up = sub.y > 0 && grid[sub.y - 1][sub.x] != '#' && grid[sub.y - 1][sub.x] != ' ';
+            bool has_down = sub.y < height - 1 && grid[sub.y + 1][sub.x] != '#' && grid[sub.y + 1][sub.x] != ' ';
+            bool has_left = sub.x > 0 && grid[sub.y][sub.x - 1] != '#' && grid[sub.y][sub.x - 1] != ' ';
+            bool has_right = sub.x < width - 1 && grid[sub.y][sub.x + 1] != '#' && grid[sub.y][sub.x + 1] != ' ';
+
+            if (!has_up && !has_down && !has_left && !has_right)
+            {
+                sub.last_message = "Nothing interesting nearby.";
+                return;
+            }
+
+            char choice;
+
+            //alot of this is kinda the same from what i remember copy paste some what
+            while (true)
+            {
+                cout << "\n=== Cave Inspection Menu ===" << endl;
+
+                if (has_up) cout << "[W] Inspect object above" << endl;
+                if (has_down) cout << "[S] Inspect object below" << endl;
+                if (has_left) cout << "[A] Inspect object to the left" << endl;
+                if (has_right) cout << "[D] Inspect object to the right" << endl;
+
+                cout << "[C] Cancel inspect menu" << endl;
+
+                cout << "\nChoose direction: ";
+
+                cin >> choice;
+                choice = tolower(choice);
+
+                if (choice == 'c')
+                {
+                    return;
+                }
+
+                int target_x = sub.x;
+                int target_y = sub.y;
+
+                //check valid
+                if (choice == 'w' && has_up) 
+                {
+                    target_y--;
+                } else if (choice == 's' && has_down) 
+                {
+                    target_y++;
+                } else if (choice == 'a' && has_left) 
+                {
+                    target_x--;
+                } else if (choice == 'd' && has_right) 
+                {
+                    target_x++;
+                }else
+                {
+                    cout << "Invalid direction!" << endl;
+                    continue;
+                }
+
+                char& tile = grid[target_y][target_x];
+
+                //gem iteraction menu thing
+                if (tile == '$')
+                {
+                    cout << "\nYou found a rare gemstone!" << endl;
+                    
+                         sub.total_earnings += 1000;
+
+                         tile = ' ';
+
+                         sub.last_message = "Rare Gemstone collected! +$1000!";
+                }
+
+                //levers menu
+                else if (tile == '/')
+                {
+                    int lever_id = 0;
+
+                }
+
+                
+            }
+
+        }
+
+
 
 };
 
