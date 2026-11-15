@@ -944,6 +944,46 @@ class cave_map
                 cout << "\nChoose direction: ";
 
                 cin >> choice;
+
+
+                if (cin.fail())
+                {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                    bool need_or = false;
+                    cout << "Input error! Please enter ";
+                    if (has_up)
+                    {
+                        cout << "W, ";
+                        need_or = true;
+                    }
+                    if (has_left)
+                    {
+                        cout << "A, ";
+                        need_or = true;
+                    }
+                    if (has_down)
+                    {
+                        cout << "S, ";
+                        need_or = true;
+                    }
+                    if (has_right)
+                    {
+                        cout << "D, ";
+                        need_or = true;
+                    }
+                    if (need_or == true)
+                    {
+                        cout << "or ";
+                    }
+                    cout << "C." << endl;
+
+                    continue;
+                }
+
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
                 choice = tolower(choice);
 
                 if (choice == 'c')
@@ -1037,16 +1077,15 @@ class cave_map
                         //valid input?
                         if (confirm == 'y')
                         {
-                            //I will make a function for this later
-                            cout << "test that this runs";
-
                             activate_lever(lever_id, sub);
                             valid_input = true;
+                            return;
                         } 
                         else if (confirm == 'n')
                         {
                             sub.last_message = "You didn't toutch the lever.";
                             valid_input = true;
+                            return;
                         }
                         else 
                         {
@@ -1072,7 +1111,7 @@ class cave_map
                     }
 
                     cout << "You discovered a mechanical door!" << endl
-                         << "the number" << door_id << "is stamped all over the door" << endl;
+                         << "the number " << door_id << " is stamped all over the door" << endl;
 
                 }
 
