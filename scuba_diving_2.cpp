@@ -1027,9 +1027,10 @@ class cave_map
                          sub.last_message = "Rare Gemstone collected! +$1000!";
                 }
 
-                else if (tile == '0')
+                if (tile == '0')
                 {
                     sub.last_message = "You see what looks like air bubbles?";
+                    return;
                 }
 
                 //levers menu
@@ -1047,8 +1048,8 @@ class cave_map
                         lever_id = 2;
                     }
 
-                    sub.last_message = "You descovered a mechanical lever.\nThis lever looks like it has a symbol, its hard to read but it looks like the number " + to_string(lever_id);
-                         return;
+                    cout << "You descovered a mechanical lever." << endl
+                         <<" This lever looks like it has a symbol, its hard to read but it looks like the number "  << lever_id << endl;
 
 
                     char confirm = ' ';
