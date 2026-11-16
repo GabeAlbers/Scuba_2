@@ -96,6 +96,21 @@ class game_map
             int start_y = sub.y - half_size;
             int end_y = sub.y + half_size;
 
+            //vertical clamp added 
+            if (start_y < 0)
+            {
+            end_y += -start_y;
+            start_y = 0;
+            }
+
+            if (end_y >= height)
+            {
+                int difference = end_y - (height - 1);
+                start_y -= difference;
+                end_y = height - 1;
+            }
+
+
             //this is used to clamp the camera when we 
             // reach a boundery horizontaly
             if (start_x < 0)
