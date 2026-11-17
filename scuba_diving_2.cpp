@@ -847,7 +847,7 @@ class cave_map
             //remove oxygen
             if (sub.current_oxygen > 0)
             {
-                //sub.current_oxygen--;
+                sub.current_oxygen--;
             }
 
             //successfull movment message so you dont keep errors and such
@@ -1169,7 +1169,7 @@ void submarine::player_input(char input, const game_map& map)
 
         if (current_oxygen > 0)
         {
-            //current_oxygen--;
+            current_oxygen--;
         }
 
         //successfull movment message so you dont keep errors and such again...
